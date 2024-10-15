@@ -52,11 +52,66 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 public class User {
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public LocalDateTime getAccountCreated() {
+        return accountCreated;
+    }
+
+    public LocalDateTime getAccountUpdated() {
+        return accountUpdated;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty("id")
     private UUID id;
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setAccountCreated(LocalDateTime accountCreated) {
+        this.accountCreated = accountCreated;
+    }
+
+    public void setAccountUpdated(LocalDateTime accountUpdated) {
+        this.accountUpdated = accountUpdated;
+    }
 
     @Column(name = "first_name")
     @JsonProperty("first_name")
