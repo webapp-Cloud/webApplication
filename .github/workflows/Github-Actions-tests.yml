@@ -1,3 +1,36 @@
+#name: PR Test Workflow
+#
+#on:
+#  pull_request:
+#    branches:
+#      - main
+#
+#jobs:
+#  test:
+#    name : 'Test'
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Set up JDK 21
+#        uses: actions/setup-java@v2
+#        with:
+#          java-version: "21"
+#          distribution: "adopt"
+#
+#      - name: Build with Maven
+#        run: mvn clean install -DskipTests
+#
+#      - name: Run tests
+#        run: mvn test
+#        env:
+#          POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+#          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+#          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+
+
+
 name: PR Test Workflow
 
 on:
@@ -7,7 +40,7 @@ on:
 
 jobs:
   test:
-    name : 'Test'
+    name: 'Test'
     runs-on: ubuntu-latest
 
     steps:
@@ -22,9 +55,15 @@ jobs:
       - name: Build with Maven
         run: mvn clean install -DskipTests
 
+      - name: Set up test database
+        run: |
+          sudo -u postgres psql -c "CREATE DATABASE testdb;"
+          sudo -u postgres psql -c "CREATE USER testuser WITH PASSWORD 'testpassword';"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE testdb TO testuser;"
+
       - name: Run tests
         run: mvn test
         env:
-          POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
+          SPRING_DATASOURCE_USERNAME: testuser
+          SPRING_DATASOURCE_PASSWORD: testpassword
