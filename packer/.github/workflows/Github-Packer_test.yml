@@ -8,6 +8,7 @@ on:
 
 jobs:
   validate-packer-template:
+    name: 'packer-Test'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
