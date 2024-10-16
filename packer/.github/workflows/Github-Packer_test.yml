@@ -1,0 +1,40 @@
+name: Packer Template Validation
+
+on:
+  pull_request:
+    paths:
+      - 'aws-ami.pkr.hcl'
+      - 'setup.sh'
+
+jobs:
+  validate-packer-template:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: '>= 1.0.0 , < 2.0.0'  # Adjust this version if needed
+
+      - name: Packer fmt
+        run: |
+          packer fmt -check aws-ami.pkr.hcl
+        continue-on-error: false
+        id: fmt
+
+      - name: Packer Validate
+        run: packer validate aws-ami.pkr.hcl
+
+      - name: Check Packer fmt result
+        if: steps.fmt.outcome == 'failure'
+        run: |
+          echo "Packer fmt check failed. Please run 'packer fmt' locally and commit the changes."
+          exit 1
+
+      - name: Prevent merge on failure
+        if: failure()
+        run: |
+          echo "Workflow failed. Please fix the issues before merging."
+          exit 1
