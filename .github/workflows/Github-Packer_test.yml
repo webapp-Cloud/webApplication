@@ -1,6 +1,12 @@
 name: Packer Template Validation
 
+
 on:
+  push:
+    paths:
+      - 'aws-ami.pkr.hcl'
+      - 'setup.sh'
+
   pull_request:
     paths:
       - 'aws-ami.pkr.hcl'
