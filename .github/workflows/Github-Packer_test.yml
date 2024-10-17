@@ -38,7 +38,7 @@ jobs:
 
       - name: Validate Packer template
         run: |
-          packer validate -var-file=PKR/variables.pkvars.hcl PKR/aws-ami.pkr.hcl
+          packer validate -var-file=PKR/variables.pkvars.hcl PKR/aws-ami.pkr.hcl PKR/setup.sh PKR/csye6225.service
         continue-on-error: false
 
 #    This is packer_test
