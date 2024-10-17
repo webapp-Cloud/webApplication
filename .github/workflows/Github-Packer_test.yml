@@ -21,10 +21,10 @@ jobs:
 
       - name: Check Packer formatting
         run: |
-          packer fmt -check aws-ami.pkr.hcl
+          packer fmt -check PKR/aws-ami.pkr.hcl
         continue-on-error: false
 
       - name: Validate Packer template
         run: |
-          packer validate aws-ami.pkr.hcl
+          packer validate PKR/aws-ami.pkr.hcl
         continue-on-error: false
