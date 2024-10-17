@@ -19,12 +19,12 @@ jobs:
         with:
           version: '1.9.0'  # You can specify your preferred Packer version here
 
-      - name: Check directory structure
-        run: |
-              echo "Current directory:"
-              pwd
-              echo "Directory contents:"
-              ls -R  
+#      - name: Check directory structure
+#        run: |
+#              echo "Current directory:"
+#              pwd
+#              echo "Directory contents:"
+#              ls -R
 
       - name: Check Packer formatting
         run: |
