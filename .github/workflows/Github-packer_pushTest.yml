@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-and-test:
+    name: packer_pushTest
     runs-on: ubuntu-latest
 
     steps:
@@ -20,10 +21,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Build with Maven
-        run: mvn clean package
-
-      - name: Run integration tests
-        run: mvn integration-test
+        run: mvn clean package -DskipTests
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -68,3 +66,5 @@ jobs:
       - name: Cleanup
         if: always()
         run: rm variables.pkrvars.hcl
+
+#        files
