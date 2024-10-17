@@ -58,7 +58,7 @@ build {
   ]
 
   provisioner "shell" {
-    script = "setup.sh"
+    script = "PKR/setup.sh"
     environment_vars = [
       "DB_URL=${var.db_url}",
       "DB_USERNAME=${var.db_username}",
@@ -92,7 +92,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "csye6225.service"
+    source      = "PKR/csye6225.service"
     destination = "/tmp/csye6225.service"
   }
 
