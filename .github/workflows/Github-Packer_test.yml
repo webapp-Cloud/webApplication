@@ -21,12 +21,12 @@ jobs:
 
       - name: Check Packer formatting
         run: |
-          packer fmt -check PKR/aws-ami.pkr.hcl
+          packer fmt .
         continue-on-error: false
 
       - name: Validate Packer template
         run: |
-          packer validate PKR/aws-ami.pkr.hcl
+          packer validate .
         continue-on-error: false
 
 #    This is packer_test
