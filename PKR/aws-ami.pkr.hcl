@@ -82,7 +82,7 @@ provisioner "file" {
     source      = "${path.root}/../target/cloud-csye-0.0.1-SNAPSHOT.jar"
     destination = "/tmp/cloud-csye6225-rishabh.jar"
   }
-  
+//   made changes to file root
   provisioner "shell" {
     inline = [
       "sudo mv /tmp/cloud-csye6225-rishabh.jar /opt/csye6225/app/",
