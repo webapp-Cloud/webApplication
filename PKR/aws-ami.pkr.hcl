@@ -79,7 +79,7 @@ build {
   }
 
 provisioner "file" {
-    source      = "${path.root}/../target/cloud-csye-0.0.1-SNAPSHOT.jar"
+    source      = "./../target/cloud-csye-0.0.1-SNAPSHOT.jar"
     destination = "/tmp/cloud-csye6225-rishabh.jar"
   }
 //   made changes to file root source
