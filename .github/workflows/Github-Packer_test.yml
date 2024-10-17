@@ -28,7 +28,7 @@ jobs:
 
       - name: Initialize Packer Configuration
         run: |
-         packer init -upgrade PKR/aws-ami.pkr.hcl
+         packer init -upgrade .
         continue-on-error: false
 
       - name: Check Packer formatting
