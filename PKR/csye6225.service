@@ -1,5 +1,5 @@
 [Unit]
-Description=CSYE6225 Spring Boot Application
+Description=CSYE6225 Web Application
 After=network.target
 
 [Service]
@@ -7,9 +7,22 @@ User=csye6225
 Group=csye6225
 Type=simple
 EnvironmentFile=/etc/csye6225/application-env
-ExecStart=/usr/bin/java -jar /opt/csye6225/app/cloud-csye6225-rishabh.jar
-Restart=on-failure
-RestartSec=5
+ExecStart=/usr/bin/java -jar /opt/csye6225/webapp.jar
+Restart=always
+RestartSec=10
+WorkingDirectory=/opt/csye6225
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ReadOnlyDirectories=/
+ReadWriteDirectories=/opt/csye6225
+PrivateDevices=true
 
 [Install]
 WantedBy=multi-user.target
