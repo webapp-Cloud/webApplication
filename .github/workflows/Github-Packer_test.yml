@@ -1,32 +1,64 @@
-name: Packer Template Check
+name: Packer Template Validation
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
+    paths:
+      - '**.pkr.hcl'
+      - '**.pkrvars.hcl'
+      - '**.sh'
 
 jobs:
   packer-check:
-    name: packer-test
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Setup Packer
-        uses: hashicorp/setup-packer@main
-        with:
-          version: '1.9.0'  # You can specify your preferred Packer version here
+    - name: Setup Packer
+      uses: hashicorp/setup-packer@main
+      with:
+        version: "1.9.4"  # Specifying version for consistency
 
-      - name: Check Packer formatting
-        run: |
-          packer fmt -check aws-ami.pkr.hcl variable.pkvars.hcl
-        continue-on-error: false
+    - name: Check Packer files format
+      run: |
+        if ! packer fmt -check packer-template.pkr.hcl; then
+          echo "Packer template file is not properly formatted. Running 'packer fmt' to show needed changes:"
+          packer fmt packer-template.pkr.hcl
+          exit 1
+        fi
+        if ! packer fmt -check packer-vars.pkrvars.hcl; then
+          echo "Packer variables file is not properly formatted. Running 'packer fmt' to show needed changes:"
+          packer fmt packer-vars.pkrvars.hcl
+          exit 1
+        fi
 
-      - name: Validate Packer template
-        run: |
-          packer validate aws-ami.pkr.hcl variable.pkvars.hcl
-        continue-on-error: false
+    - name: Initialize Packer
+      run: |
+        packer init packer-template.pkr.hcl
 
-#    This is packer_test
+    - name: Validate Packer Template
+      run: |
+        if ! packer validate -var-file=packer-vars.pkrvars.hcl packer-template.pkr.hcl; then
+          echo "Packer template validation failed"
+          exit 1
+        fi
+      env:
+        PKR_VAR_aws_region: "us-east-1"
+        PKR_VAR_instance_type: "t2.small"
+        PKR_VAR_ami_users: '["039612889197"]'
+        PKR_VAR_subnet_id: "subnet-01a59eccc79d41023"
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Verify Shell Scripts
+      run: |
+        for script in setup_system.sh setup_application.sh; do
+          if [ -f "$script" ]; then
+            if ! bash -n "$script"; then
+              echo "Shell script $script contains syntax errors"
+              exit 1
+            fi
+          fi
+        done
