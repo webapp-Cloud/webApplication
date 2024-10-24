@@ -1,32 +1,42 @@
-name: Packer Template Check
+name: Packer PR Validation
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
 
 jobs:
-  packer-check:
-    name: packer-test
+  validate:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Packer
         uses: hashicorp/setup-packer@main
         with:
-          version: '1.9.0'  # You can specify your preferred Packer version here
+          version: '1.9.4'
 
       - name: Check Packer formatting
         run: |
-          packer fmt -check aws-ami.pkr.hcl variable.pkvars.hcl
-        continue-on-error: false
+          packer fmt -check .
+          if [ $? -eq 0 ]; then
+            echo "✅ Packer files are properly formatted"
+          else
+            echo "❌ Packer files need formatting"
+            exit 1
+          fi
 
-      - name: Validate Packer template
+      - name: Initialize Packer
+        run: packer init .
+        
+      - name: Validate Packer Template
         run: |
-          packer validate aws-ami.pkr.hcl variable.pkvars.hcl
-        continue-on-error: false
-
-#    This is packer_test
+          packer validate -var-file=packer-vars.pkrvars.hcl packer-template.pkr.hcl
+          if [ $? -eq 0 ]; then
+            echo "✅ Packer template is valid"
+          else
+            echo "❌ Packer template validation failed"
+            exit 1
+          fi
