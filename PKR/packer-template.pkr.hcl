@@ -15,7 +15,7 @@ variable "aws_region" {
 
 variable "source_ami" {
   type    = string
-  default = "ami-0866a3c8686eaeeba"  # Ubuntu 22.04 LTS AMI ID
+  default = "ami-0866a3c8686eaeeba" # Ubuntu 22.04 LTS AMI ID
 }
 
 variable "instance_type" {
@@ -30,12 +30,12 @@ variable "ssh_username" {
 
 variable "subnet_id" {
   type    = string
-  default = null  # Will use default subnet if not specified
+  default = null # Will use default subnet if not specified
 }
 
 variable "ami_users" {
   type    = list(string)
-  default = ["039612889197"]    # Empty list by default
+  default = ["039612889197"] # Empty list by default
 }
 
 variable "ami_name_prefix" {
@@ -71,35 +71,35 @@ source "amazon-ebs" "ubuntu" {
 
   launch_block_device_mappings {
     device_name           = "/dev/xvda"
-    volume_size          = 25
-    volume_type          = "gp2"
+    volume_size           = 25
+    volume_type           = "gp2"
     delete_on_termination = true
   }
 }
 
 # Build block
 build {
-  name = "csye6225-ami"
+  name    = "csye6225-ami"
   sources = ["source.amazon-ebs.ubuntu"]
 
   # Copy application files
   provisioner "file" {
-    source      = "target/cloud-csye-0.0.1-SNAPSHOT.jar"
+    source      = "./../target/cloud-csye-0.0.1-SNAPSHOT.jar"
     destination = "/tmp/webapp.jar"
   }
 
   provisioner "file" {
-    source      = "PKR/setup_system.sh"
+    source      = "setup_system.sh"
     destination = "/tmp/setup_system.sh"
   }
 
   provisioner "file" {
-    source      = "PKR/setup_application.sh"
+    source      = "setup_application.sh"
     destination = "/tmp/setup_application.sh"
   }
 
   provisioner "file" {
-    source      = "PKR/csye6225.service"
+    source      = "csye6225.service"
     destination = "/tmp/csye6225.service"
   }
 
