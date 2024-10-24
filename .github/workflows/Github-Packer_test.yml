@@ -23,18 +23,18 @@ jobs:
       - name: Initialize Packer Plugins
         id: init
         run: |
-          cd packer
+          cd PKR
           packer init .
           packer plugins installed
 
       - name: Check Packer Format
         id: fmt
         run: |
-          cd packer
+          cd PKR
           packer fmt -check .
 
       - name: Validate Packer Template
         id: validate
         run: |
-          cd packer
+          cd PKR
           packer validate .
