@@ -47,6 +47,6 @@ jobs:
                            -var subnet_id=${{ secrets.SUBNET_ID }} \
                            -var ami_users=${{ secrets.AMI_USERS }} \
                            -var db_name=csye6225 \
-                           -var db_username=${{ secrets.DB_USERNAME }} \
-                           -var db_password=${{ secrets.DB_PASSWORD }} \
+                           # -var db_username=${{ secrets.DB_USERNAME }} \
+                           # -var db_password=${{ secrets.DB_PASSWORD }} \
                            packer-template.pkr.hcl
