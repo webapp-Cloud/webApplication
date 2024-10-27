@@ -8,7 +8,7 @@ apt-get update
 apt-get upgrade -y
 
 # Install required packages (no PostgreSQL, only Java)
-apt-get install -y openjdk-17-jdk maven curl unzip
+apt-get install -y openjdk-21-jdk maven curl unzip
 
 # Create application user and group
 useradd -m -s /bin/bash csye6225
