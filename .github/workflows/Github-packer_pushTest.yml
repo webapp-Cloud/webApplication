@@ -54,4 +54,3 @@ jobs:
             -var="subnet_id=${{ secrets.SUBNET_ID }}" \
             -var='ami_users=["${{ secrets.AMI_USERS }}"]' \
             .
-           shell: bash
