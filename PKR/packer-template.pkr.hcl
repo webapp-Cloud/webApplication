@@ -53,11 +53,11 @@ source "amazon-ebs" "ubuntu" {
   ami_users       = var.ami_users
 
   source_ami_filter {
-#     filters = {
-#       name                = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
-#       root-device-type    = "ebs"
-#       virtualization-type = "hvm"
-#     }//ghgh
+    filters = {
+      name                = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
+      root-device-type    = "ebs"
+      virtualization-type = "hvm"
+    }
     most_recent = true
     owners      = ["099720109477"] # Canonical's AWS account ID
   }
@@ -76,7 +76,7 @@ source "amazon-ebs" "ubuntu" {
     delete_on_termination = true
   }
 }
-
+# buildiing block
 # Build block
 build {
   name    = "csye6225-ami"
