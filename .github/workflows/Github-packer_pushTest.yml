@@ -44,14 +44,20 @@ jobs:
         working-directory: PKR
         env:
           PACKER_LOG: 1
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
         run: |
           packer init .
-          packer validate -var="aws_region=${{ secrets.AWS_REGION }}" \
+          packer validate \
+            -var="aws_region=${{ secrets.AWS_REGION }}" \
             -var="subnet_id=${{ secrets.SUBNET_ID }}" \
             -var='ami_users=["${{ secrets.AMI_USERS }}"]' \
             .
-          packer build -var="aws_region=${{ secrets.AWS_REGION }}" \
+          packer build \
+            -var="aws_region=${{ secrets.AWS_REGION }}" \
             -var="subnet_id=${{ secrets.SUBNET_ID }}" \
             -var='ami_users=["${{ secrets.AMI_USERS }}"]' \
             .
-           shell: bash
+
+      - name: Verify Build Status
+        if: success()
+        run: echo "Packer build completed successfully"
