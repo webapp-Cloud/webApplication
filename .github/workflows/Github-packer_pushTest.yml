@@ -42,11 +42,11 @@ jobs:
       - name: Build Packer Image
         run: |
               cd PKR
-              packer init packer-template.pkr.hcl
+              packer init .
               packer build -var aws_region=${{ secrets.AWS_REGION }} \
                            -var subnet_id=${{ secrets.SUBNET_ID }} \
                            -var ami_users=${{ secrets.AMI_USERS }} \
                            -var db_name=csye6225 \
                            # -var db_username=${{ secrets.DB_USERNAME }} \
                            # -var db_password=${{ secrets.DB_PASSWORD }} \
-                           packer-template.pkr.hcl
+                           .
