@@ -1,3 +1,5 @@
+name: Packer Custom Image Build
+
 on:
   pull_request:
     types:
@@ -9,7 +11,6 @@ jobs:
   build:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -27,8 +28,8 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v2
         with:
-              java-version: "21"
-              distribution: "adopt"
+          java-version: "21"
+          distribution: "adopt"
 
       - name: Build with Maven
         env:
@@ -40,13 +41,16 @@ jobs:
         run: mvn test
 
       - name: Build Packer Image
+        working-directory: PKR
+        env:
+          PACKER_LOG: 1
         run: |
-              cd PKR
-              packer init .
-              packer build -var aws_region=${{ secrets.AWS_REGION }} \
-                           -var subnet_id=${{ secrets.SUBNET_ID }} \
-                           -var ami_users=${{ secrets.AMI_USERS }} \
-                           -var db_name=csye6225 \
-                           # -var db_username=${{ secrets.DB_USERNAME }} \
-                           # -var db_password=${{ secrets.DB_PASSWORD }} \
-                           .
+          packer init .
+          packer validate -var="aws_region=${{ secrets.AWS_REGION }}" \
+            -var="subnet_id=${{ secrets.SUBNET_ID }}" \
+            -var='ami_users=["${{ secrets.AMI_USERS }}"]' \
+            .
+          packer build -var="aws_region=${{ secrets.AWS_REGION }}" \
+            -var="subnet_id=${{ secrets.SUBNET_ID }}" \
+            -var='ami_users=["${{ secrets.AMI_USERS }}"]' \
+            .
