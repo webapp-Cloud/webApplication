@@ -53,11 +53,11 @@ source "amazon-ebs" "ubuntu" {
   ami_users       = var.ami_users
 
   source_ami_filter {
-    # filters = {
-    #   name                = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
-    #   root-device-type    = "ebs"
-    #   virtualization-type = "hvm"
-    # }
+    filters = {
+      name                = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
+      root-device-type    = "ebs"
+      virtualization-type = "hvm"
+    }
     most_recent = true
     owners      = ["099720109477"] # Canonical's AWS account ID
   }
@@ -70,7 +70,7 @@ source "amazon-ebs" "ubuntu" {
   }
 
   launch_block_device_mappings {
-    device_name           = "/dev/xvda"
+    device_name           = "/dev/sda1"
     volume_size           = 25
     volume_type           = "gp2"
     delete_on_termination = true
