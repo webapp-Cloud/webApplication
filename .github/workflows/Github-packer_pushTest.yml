@@ -1,38 +1,52 @@
-name: Packer Custom Image Build
-
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - main
 
 jobs:
-  build-packer-image:
-    name: Build Packer Image
+  build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Install AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
       - name: Install Packer
-        run: |
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get update && sudo apt-get install packer -y
-          packer --version
+        uses: hashicorp/setup-packer@v2
 
-      - name: Zip all files
-        run: zip -r webapp.zip .
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+              java-version: "21"
+              distribution: "adopt"
+
+      - name: Build with Maven
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: mvn clean install -DskipTests
+
+      - name: Run tests
+        run: mvn test
 
       - name: Build Packer Image
         run: |
-          packer init .
-          packer build .
-        shell: bash
+              cd PKR
+              packer init .
+              packer build -var aws_region=${{ secrets.AWS_REGION }} \
+                           -var subnet_id=${{ secrets.SUBNET_ID }} \
+                           -var ami_users=${{ secrets.AMI_USERS }} \
+                           -var db_name=csye6225 \
+                           # -var db_username=${{ secrets.DB_USERNAME }} \
+                           # -var db_password=${{ secrets.DB_PASSWORD }} \
+                           .
