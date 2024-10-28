@@ -54,7 +54,7 @@ jobs:
             -var="subnet_id=${{ secrets.SUBNET_ID }}" \
             -var='ami_users=["${{ secrets.AMI_USERS }}"]' \
             .
-#this is the verify command
+
       - name: Verify Build Status
         if: success()
         run: echo "Packer build completed successfully"
