@@ -102,7 +102,7 @@ build {
     source      = "csye6225.service"
     destination = "/tmp/csye6225.service"
   }
-  
+
   # Execute setup scripts
   provisioner "shell" {
     inline = [
@@ -124,3 +124,5 @@ build {
     ]
   }
 }
+
+//This is packer-template.pkr.hcl file
