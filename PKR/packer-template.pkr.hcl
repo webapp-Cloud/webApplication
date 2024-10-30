@@ -54,14 +54,14 @@ source "amazon-ebs" "ubuntu" {
 
   source_ami_filter {
     filters = {
-      name                = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
+      name                = "ubuntu/images/*ubuntu-noble-24.04-amd64-server-*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
     most_recent = true
     owners      = ["099720109477"] # Canonical's AWS account ID
   }
-
+#   this is for new source ami
   tags = {
     Name        = "CSYE6225 AMI"
     Environment = "Development"
@@ -125,5 +125,4 @@ build {
   }
 }
 
-//This is packer-template.pkr.hcl file
 
