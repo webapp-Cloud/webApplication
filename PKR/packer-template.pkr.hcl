@@ -52,7 +52,7 @@ source "amazon-ebs" "ubuntu" {
   ami_description = "Ubuntu AMI for CSYE6225 with Java application"
   ami_users       = var.ami_users
 
-  source_ami_filter {
+source_ami_filter {
     filters = {
       name                = "ubuntu/images/*ubuntu-noble-24.04-amd64-server-*"
       root-device-type    = "ebs"
@@ -70,13 +70,13 @@ source "amazon-ebs" "ubuntu" {
   }
 
   launch_block_device_mappings {
-    device_name           = "/dev/xvda"
+    device_name           = "/dev/sda1"
     volume_size           = 25
     volume_type           = "gp2"
     delete_on_termination = true
   }
 }
-
+# buildiing block
 # Build block
 build {
   name    = "csye6225-ami"
@@ -124,3 +124,6 @@ build {
     ]
   }
 }
+
+//This is packer-template.pkr.hcl file
+
