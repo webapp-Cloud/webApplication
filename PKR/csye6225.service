@@ -21,7 +21,7 @@ ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
 ReadOnlyDirectories=/
-ReadWriteDirectories=/opt/csye6225
+ReadWriteDirectories=/opt/csye6225 /var/log/webapp
 PrivateDevices=true
 
 [Install]

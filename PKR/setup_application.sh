@@ -3,6 +3,33 @@ set -e
 
 echo "Starting application setup..."
 
+# Check if user exists first
+if ! id csye6225 > /dev/null 2>&1; then
+    echo "Error: Required user 'csye6225' does not exist"
+    echo "Please run setup_system.sh first"
+    exit 1
+fi
+
+# Check if group exists
+if ! getent group csye6225 > /dev/null 2>&1; then
+    echo "Error: Required group 'csye6225' does not exist"
+    echo "Please run setup_system.sh first"
+    exit 1
+fi
+
+# Check if required directories exist
+for dir in "/opt/csye6225" "/etc/csye6225" "/var/log/webapp"; do
+    if [ ! -d "$dir" ]; then
+        echo "Error: Required directory $dir does not exist"
+        echo "Please run setup_system.sh first"
+        exit 1
+    fi
+done
+##!/bin/bash
+#set -e
+#
+echo "Starting application setup..."
+
 # Define variables
 APP_USER="csye6225"
 APP_GROUP="csye6225"

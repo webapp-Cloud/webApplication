@@ -61,7 +61,7 @@ source "amazon-ebs" "ubuntu" {
     most_recent = true
     owners      = ["099720109477"] # Canonical's AWS account ID
   }
-#   this is for new source ami
+  #   this is for new source ami
   tags = {
     Name        = "CSYE6225 AMI"
     Environment = "Development"
@@ -102,14 +102,60 @@ build {
     source      = "csye6225.service"
     destination = "/tmp/csye6225.service"
   }
+  provisioner "file" {
+    source      = "amazon-cloudwatch-agent.json"
+    destination = "/tmp/amazon-cloudwatch-agent.json"
+  }
+  # Execute setup scripts
+  #   provisioner "shell" {
+  #     inline = [
+  #       "chmod +x /tmp/setup_system.sh",
+  #       "sudo /tmp/setup_system.sh",
+  #       "chmod +x /tmp/setup_application.sh",
+  #       "sudo /tmp/setup_application.sh",
+  #       "sudo mv /tmp/amazon-cloudwatch-agent.json /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
+  #       #
+  #       "sudo chmod 644 /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
+  #       "sudo chown root:root /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
+  #       #
+  #       "sudo systemctl enable amazon-cloudwatch-agent",
+  #       #
+  #       # Verify CloudWatch agent configuration
+  #       "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a verify -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
+  #       #
+  #     ]
+  #   }
 
   # Execute setup scripts
   provisioner "shell" {
     inline = [
+      "echo '=== Starting system setup ==='",
       "chmod +x /tmp/setup_system.sh",
       "sudo /tmp/setup_system.sh",
+
+      "echo '=== Verifying system setup ==='",
+      "id csye6225 || (echo 'User creation failed' && exit 1)",
+      "getent group csye6225 || (echo 'Group creation failed' && exit 1)",
+      "[ -d /opt/csye6225 ] || (echo 'Directory creation failed' && exit 1)",
+
+      "echo '=== Starting application setup ==='",
       "chmod +x /tmp/setup_application.sh",
-      "sudo /tmp/setup_application.sh"
+      "sudo /tmp/setup_application.sh",
+
+      "echo '=== Configuring CloudWatch agent ==='",
+      "sudo mkdir -p /opt/aws/amazon-cloudwatch-agent/etc",
+      "sudo mv /tmp/amazon-cloudwatch-agent.json /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
+      "sudo chown root:root /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
+      "sudo chmod 644 /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json",
+
+      "echo '=== Verifying CloudWatch agent configuration ==='",
+      "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s",
+      "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status",
+
+
+      "echo '=== Enabling services ==='",
+      "sudo systemctl enable csye6225.service",
+      "sudo systemctl enable amazon-cloudwatch-agent.service"
     ]
   }
 
@@ -119,6 +165,7 @@ build {
       "echo 'Verifying installation...'",
       "java -version",
       "sudo systemctl status csye6225 || true",
+      "sudo systemctl status amazon-cloudwatch-agent || true",
       "ls -la /opt/csye6225",
       "sudo cat /etc/systemd/system/csye6225.service"
     ]
