@@ -1,15 +1,16 @@
 package com.rio_rishabhNEU.UserApp.config;
 
 import com.rio_rishabhNEU.UserApp.Service.S3Service;
-import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.services.s3.S3Client;
+import org.mockito.Mockito;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.micrometer.core.instrument.MeterRegistry;
 
-@Configuration
+@TestConfiguration
 @Profile("test")
 public class TestConfig {
 
@@ -23,5 +24,11 @@ public class TestConfig {
     @Primary
     public S3Service s3Service() {
         return Mockito.mock(S3Service.class);
+    }
+
+    @Bean
+    @Primary
+    public MeterRegistry meterRegistry() {
+        return new SimpleMeterRegistry();
     }
 }

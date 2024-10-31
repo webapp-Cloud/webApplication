@@ -29,9 +29,14 @@ mkdir -p /var/log/webapp
 chown -R csye6225:csye6225 /opt/csye6225
 chown -R csye6225:csye6225 /etc/csye6225
 chown -R csye6225:csye6225 /var/log/webapp
+
 chmod 755 /opt/csye6225
 chmod 755 /etc/csye6225
 chmod 755 /var/log/webapp
+touch /var/log/webapp/application.log
+chown csye6225:csye6225 /var/log/webapp/application.log
+chmod 644 /var/log/webapp/application.log
+
 # Clean up
 apt-get clean
 rm -rf /var/lib/apt/lists/*
