@@ -2,13 +2,16 @@ package com.rio_rishabhNEU.UserApp;
 
 import com.rio_rishabhNEU.UserApp.Controllers.UserController;
 import com.rio_rishabhNEU.UserApp.Model.User;
+import com.rio_rishabhNEU.UserApp.Service.S3Service;
 import com.rio_rishabhNEU.UserApp.Service.UserService;
+import com.rio_rishabhNEU.UserApp.config.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import(TestConfig.class)
 public class UserControllerInTest {
 
     @Autowired
@@ -28,6 +32,9 @@ public class UserControllerInTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private S3Service s3Service;
 
     @Autowired
     private UserController userController;
@@ -55,5 +62,6 @@ public class UserControllerInTest {
     }
 
     // Add more test methods here...
+
 
 }

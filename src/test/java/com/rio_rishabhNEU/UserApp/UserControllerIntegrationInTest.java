@@ -2,14 +2,18 @@ package com.rio_rishabhNEU.UserApp;
 
 import com.rio_rishabhNEU.UserApp.ExceptionHandlers.EmailNotAvailableException;
 import com.rio_rishabhNEU.UserApp.Model.User;
+import com.rio_rishabhNEU.UserApp.Service.S3Service;
 import com.rio_rishabhNEU.UserApp.Service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.rio_rishabhNEU.UserApp.config.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
+@Import(TestConfig.class)
 class UserControllerIntegrationInTest {
 
     @Autowired
@@ -37,6 +42,9 @@ class UserControllerIntegrationInTest {
     private ObjectMapper objectMapper;
 
     private User testUser;
+
+    @MockBean
+    private S3Service s3Service;
 
     @BeforeEach
     void setUp() throws EmailNotAvailableException {
