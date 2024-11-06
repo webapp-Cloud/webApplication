@@ -1,9 +1,12 @@
 package com.rio_rishabhNEU.UserApp.config;
 
 import com.rio_rishabhNEU.UserApp.Service.S3Service;
+
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.mockito.Mockito;
+
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -26,9 +29,11 @@ public class TestConfig {
         return Mockito.mock(S3Service.class);
     }
 
+
     @Bean
     @Primary
     public MeterRegistry meterRegistry() {
         return new SimpleMeterRegistry();
     }
+
 }
