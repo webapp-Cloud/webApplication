@@ -1,34 +1,139 @@
-HELP.md
+# Compiled Java classes
+*.class
+
+# Maven specific
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+# IDE files
+.idea/
 *.iml
+*.iws
 *.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
 .vscode/
+*.swp
+.project
+.classpath
+.settings/
+.factorypath
+.sts4-cache/
+.springBeans
+.spring-beans.xml
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+/logs/
+*.log.*
+/log/
+
+# Application Properties (except defaults)
+src/main/resources/application-*.properties
+!src/main/resources/application.properties
+!src/main/resources/application-test.properties
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# JVM crash logs
+hs_err_pid*
+replay_pid*
+
+# Build and test artifacts
+build/
+bin/
+out/
+dist/
+test-output/
+*.class
+*.jar
+*.war
+
+# Environment files
+.env
+.env.*
+application-local.properties
+application-dev.properties
+application-prod.properties
+
+# AWS specific
+.elasticbeanstalk/
+.ebextensions/
+.aws/
+
+# JMeter
+*.jtl
+jmeter.log
+apache-jmeter/
+/test-results/
+
+# Coverage reports
+/coverage/
+.coveralls.yml
+jacoco.exec
+
+# Spring Boot specific
+spring-configuration-metadata.json
+
+# Docker
+Dockerfile.local
+docker-compose.override.yml
+
+# System Files
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Security and credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*~
+
+# Test files
+*.test
+test-results/
+/test-output/
+
+# Cache objects
+packer_cache/
+
+# Crash log
+crash.log
+#
+*.pkrvars.hcl
+
+# For built boxes
+*.box
