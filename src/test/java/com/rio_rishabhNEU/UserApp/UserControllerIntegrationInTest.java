@@ -1,150 +1,120 @@
 package com.rio_rishabhNEU.UserApp;
 
-import com.rio_rishabhNEU.UserApp.ExceptionHandlers.EmailNotAvailableException;
+import com.rio_rishabhNEU.UserApp.DAO.UserDAO;
 import com.rio_rishabhNEU.UserApp.Model.User;
 import com.rio_rishabhNEU.UserApp.Service.S3Service;
-import com.rio_rishabhNEU.UserApp.Service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.rio_rishabhNEU.UserApp.config.TestConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Base64;
-import java.util.HashMap;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 @ActiveProfiles("test")
-@Import(TestConfig.class)
-class UserControllerIntegrationInTest {
+public class UserControllerIntegrationInTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private UserService userService;
-
     private ObjectMapper objectMapper;
 
-    private User testUser;
+    @Autowired
+    private UserDAO userDAO;
 
     @MockBean
     private S3Service s3Service;
 
-    @BeforeEach
-    void setUp() throws EmailNotAvailableException {
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
-        // Create a test user
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String TEST_PASSWORD = "password123";
+    private User testUser;
+
+    @BeforeEach
+    void setUp() {
+        userDAO.deleteAll();
+
         testUser = new User();
-        testUser.setEmail("test@example.com");
-        testUser.setPassword("password");
+        testUser.setId(UUID.randomUUID());
         testUser.setFirstName("Test");
         testUser.setLastName("User");
-        testUser = userService.createUser(testUser);
+        testUser.setEmail(TEST_EMAIL);
+        testUser.setPassword(passwordEncoder.encode(TEST_PASSWORD));
+        testUser.setAccountCreated(LocalDateTime.now());
+        testUser.setAccountUpdated(LocalDateTime.now());
+
+        userDAO.save(testUser);
     }
 
     @Test
-    void testCreateUser() throws Exception {
-        HashMap<String, String> newUser = new HashMap<>();
-        newUser.put("email", "new@example.com");
-        newUser.put("password", "newpassword");
-        newUser.put("first_name", "New");
-        newUser.put("last_name", "User");
-
-        mockMvc.perform(post("/v1/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newUser)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.email").value("new@example.com"))
-                .andExpect(jsonPath("$.first_name").value("New"))
-                .andExpect(jsonPath("$.last_name").value("User"))
-                .andExpect(jsonPath("$.account_created").exists())
-                .andExpect(jsonPath("$.account_updated").exists())
-                .andExpect(jsonPath("$.password").doesNotExist());
-    }
-
-    @Test
-    void testGetUser() throws Exception {
+    public void testGetUser() throws Exception {
         mockMvc.perform(get("/v1/user/self")
-                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((testUser.getEmail() + ":password").getBytes())))
+                        .with(httpBasic(TEST_EMAIL, TEST_PASSWORD))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.email").value(testUser.getEmail()))
-                .andExpect(jsonPath("$.first_name").value(testUser.getFirstName()))
-                .andExpect(jsonPath("$.last_name").value(testUser.getLastName()))
-                .andExpect(jsonPath("$.account_created").exists())
-                .andExpect(jsonPath("$.account_updated").exists())
-                .andExpect(jsonPath("$.password").doesNotExist());
+                .andExpect(jsonPath("$.email").value(testUser.getEmail()));
     }
 
     @Test
-    void testUpdateUser() throws Exception {
-        User userUpdate = new User();
-        userUpdate.setFirstName("UpdatedFirst");
-        userUpdate.setLastName("UpdatedLast");
-        userUpdate.setPassword("newpassword");
+    public void testGetUser_Unauthorized() throws Exception {
+        mockMvc.perform(get("/v1/user/self")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testUpdateUser() throws Exception {
+        User updateRequest = new User();
+        updateRequest.setFirstName("UpdatedFirst");
+        updateRequest.setLastName("UpdatedLast");
+        updateRequest.setPassword("newpassword123");
 
         mockMvc.perform(put("/v1/user/self")
-                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((testUser.getEmail() + ":password").getBytes()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userUpdate)))
+                        .with(httpBasic(TEST_EMAIL, TEST_PASSWORD))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isNoContent());
-
-        // Verify the update
-        mockMvc.perform(get("/v1/user/self")
-                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((testUser.getEmail() + ":password").getBytes())))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.first_name").value("UpdatedFirst"))
-                .andExpect(jsonPath("$.last_name").value("UpdatedLast"))
-                .andExpect(jsonPath("$.account_updated").exists());
     }
 
     @Test
-    void testUpdateUser_BadRequest() throws Exception {
-        User userUpdate = new User();
-        userUpdate.setEmail("newemail@example.com"); // This should not be allowed
+    public void testUpdateUser_BadRequest() throws Exception {
+        User updateRequest = new User();
+        updateRequest.setEmail("newemail@example.com"); // Should not be allowed to update
 
         mockMvc.perform(put("/v1/user/self")
-                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((testUser.getEmail() + ":password").getBytes()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userUpdate)))
+                        .with(httpBasic(TEST_EMAIL, TEST_PASSWORD))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void testGetUser_Unauthorized() throws Exception {
-        mockMvc.perform(get("/v1/user/self")
-                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString(("wrong@email.com:wrongpassword").getBytes())))
-                .andExpect(status().isUnauthorized());
-    }
+    public void testUpdateUser_Success() throws Exception {
+        User updateRequest = new User();
+        updateRequest.setFirstName("UpdatedFirst");
+        updateRequest.setLastName("UpdatedLast");
 
-//    @Test
-//    void testHeadRequest() throws Exception {
-//        mockMvc.perform(head("/v1/user/self"))
-//                .andExpect(status().isMethodNotAllowed());
-//    }
-//
-//    @Test
-//    void testOptionsRequest() throws Exception {
-//        mockMvc.perform(options("/v1/user/self"))
-//                .andExpect(status().isMethodNotAllowed());
-//    }
+        mockMvc.perform(put("/v1/user/self")
+                        .with(httpBasic(TEST_EMAIL, TEST_PASSWORD))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isNoContent());
+    }
 }

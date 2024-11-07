@@ -1,15 +1,10 @@
 package com.rio_rishabhNEU.UserApp.Controllers;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.CacheControl;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -20,43 +15,46 @@ import java.util.Map;
 public class HealthzController {
 
     private final DataSource dataSource;
+    private final MeterRegistry meterRegistry;
 
     @Autowired
-    private MeterRegistry meterRegistry;
-
-    @Autowired
-    public HealthzController(DataSource dataSource) {
+    public HealthzController(DataSource dataSource, @Autowired(required = false) MeterRegistry meterRegistry) {
         this.dataSource = dataSource;
+        this.meterRegistry = meterRegistry;
     }
 
     @RequestMapping(value = "/healthz", method = RequestMethod.GET)
     public ResponseEntity<Void> healthCheck(@RequestParam Map<String, String> queryParams,
                                             @RequestBody(required = false) Map<String, Object> requestBody) {
-        // Record metric for health check
-        meterRegistry.counter("api.healthcheck").increment();
-        Timer.Sample timer = Timer.start(meterRegistry);
-
-        try {
-            if (!queryParams.isEmpty() || requestBody != null) {
-                return ResponseEntity.badRequest()
-                        .cacheControl(CacheControl.noCache())
-                        .build();
-            }
-
-            try (Connection connection = dataSource.getConnection()) {
-                timer.stop(meterRegistry.timer("api.healthcheck.time"));
-                return ResponseEntity.ok()
-                        .cacheControl(CacheControl.noCache())
-                        .build();
-            } catch (SQLException e) {
-                meterRegistry.counter("api.healthcheck.error").increment();
-                return ResponseEntity.status(503)
-                        .cacheControl(CacheControl.noCache())
-                        .build();
-            }
-        } catch (Exception e) {
-            meterRegistry.counter("api.healthcheck.error").increment();
-            throw e;
+        // Increment metrics counter if MeterRegistry is available
+        if (meterRegistry != null) {
+            meterRegistry.counter("api.calls", "endpoint", "/healthz", "method", "GET").increment();
         }
+
+        if (!queryParams.isEmpty() || requestBody != null) {
+            return ResponseEntity.badRequest()
+                    .cacheControl(CacheControl.noCache())
+                    .build();
+        }
+
+        try (Connection connection = dataSource.getConnection()) {
+            return ResponseEntity.ok()
+                    .cacheControl(CacheControl.noCache())
+                    .build();
+        } catch (SQLException e) {
+            return ResponseEntity.status(503)
+                    .cacheControl(CacheControl.noCache())
+                    .build();
+        }
+    }
+
+    @RequestMapping(value = "/healthz", method = RequestMethod.HEAD)
+    public ResponseEntity<Void> headRequest() {
+        return ResponseEntity.status(405).build();
+    }
+
+    @RequestMapping(value = "/healthz", method = RequestMethod.OPTIONS)
+    public ResponseEntity<Void> optionsRequest() {
+        return ResponseEntity.status(405).build();
     }
 }
