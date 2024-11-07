@@ -1,10 +1,28 @@
+package com.rio_rishabhNEU.UserApp.Controllers;
+
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.CacheControl;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Map;
+
 @RestController
 public class HealthzController {
 
     private final DataSource dataSource;
 
     @Autowired
-    private MeterRegistry meterRegistry; // Add metrics registry
+    private MeterRegistry meterRegistry;
 
     @Autowired
     public HealthzController(DataSource dataSource) {
