@@ -125,7 +125,6 @@ build {
   #       #
   #     ]
   #   }
-
   # Execute setup scripts
   provisioner "shell" {
     inline = [

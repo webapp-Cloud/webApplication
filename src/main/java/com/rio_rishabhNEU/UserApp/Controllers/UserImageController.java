@@ -19,6 +19,7 @@ import java.util.UUID;
 @RequestMapping("/v1/user/self")
 public class UserImageController {
     private static final Logger logger = LoggerFactory.getLogger(UserImageController.class);
+
     private final ImageService imageService;
     private final MeterRegistry meterRegistry;
 
@@ -97,8 +98,7 @@ public class UserImageController {
                 "endpoint", "/v1/user/self/pic",
                 "method", "DELETE"));
 
-        if (!deleted) {
-            logger.info("No profile picture found to delete for user: {}", email);
+        if (!deleted) {            logger.info("No profile picture found to delete for user: {}", email);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         logger.info("Successfully deleted profile picture for user: {}", email);
