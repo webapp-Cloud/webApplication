@@ -67,6 +67,7 @@ source "amazon-ebs" "ubuntu" {
     Environment = "Development"
     Course      = "CSYE6225"
     Created     = timestamp()
+    AutoScaling = "true"
   }
 
   launch_block_device_mappings {
