@@ -61,6 +61,7 @@ jobs:
             --query 'sort_by(Images, &CreationDate)[-1].ImageId' \
             --output text)
           echo "AMI_ID=${AMI_ID}" >> $GITHUB_ENV
+
       - name: Configure AWS Demo credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -70,29 +71,17 @@ jobs:
 
       - name: Update Demo Infrastructure
         run: |
-          # List all launch templates to diagnose
-          echo "Available launch templates:"
-          aws ec2 describe-launch-templates --query 'LaunchTemplates[*].{Name:LaunchTemplateName,ID:LaunchTemplateId}' --output table
-          
           echo "Looking up Demo Launch Template..."
-          # First try with exact name
+          LAUNCH_TEMPLATE_NAME="csye6225_asg_launch_template"
+          echo "Searching for template: $LAUNCH_TEMPLATE_NAME"
+          
           LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates \
-            --filters "Name=launch-template-name,Values=csye6225_asg_launch_template" \
+            --filters "Name=launch-template-name,Values=$LAUNCH_TEMPLATE_NAME" \
             --query 'LaunchTemplates[0].LaunchTemplateId' \
             --output text)
           
-          # If not found, try alternate name
           if [ "$LAUNCH_TEMPLATE_ID" = "None" ] || [ -z "$LAUNCH_TEMPLATE_ID" ]; then
-            LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates \
-              --filters "Name=launch-template-name,Values=csye6225-asg-launch-template" \
-              --query 'LaunchTemplates[0].LaunchTemplateId' \
-              --output text)
-          fi
-          
-          # Final check
-          if [ "$LAUNCH_TEMPLATE_ID" = "None" ] || [ -z "$LAUNCH_TEMPLATE_ID" ]; then
-            echo "Error: Failed to find launch template. Available templates:"
-            aws ec2 describe-launch-templates --query 'LaunchTemplates[*].LaunchTemplateName' --output table
+            echo "Error: Failed to find launch template with name: $LAUNCH_TEMPLATE_NAME"
             exit 1
           fi
           echo "Found Launch Template ID: $LAUNCH_TEMPLATE_ID"
@@ -112,12 +101,7 @@ jobs:
             --output text)
           echo "Created new version: $NEW_VERSION"
           
-          echo "Looking up Auto Scaling Groups..."
-          # List all ASGs for diagnosis
-          aws autoscaling describe-auto-scaling-groups \
-            --query 'AutoScalingGroups[*].AutoScalingGroupName' \
-            --output table
-          
+          echo "Looking up Demo Auto Scaling Group..."
           ASG_NAME="csye6225-asg"
           echo "Using ASG: $ASG_NAME"
           
