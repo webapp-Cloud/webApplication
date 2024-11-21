@@ -1,117 +1,19 @@
 package com.rio_rishabhNEU.UserApp.Model;
-//
-//import jakarta.persistence.*;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
-//import org.springframework.data.annotation.CreatedDate;
-//import org.springframework.data.annotation.LastModifiedDate;
-//import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-//
-//import java.time.LocalDateTime;
-//
-//@Data
-//@Entity
-//@Table(name = "Users", uniqueConstraints = {@UniqueConstraint(columnNames = "email"),})
-//@EntityListeners(AuditingEntityListener.class)
-//@NoArgsConstructor
-//public class UserModel {
-//
-//
-//    @Id
-//    @Column(unique = true, nullable = false)
-//    private String email;
-//
-//    @Column(unique = true, nullable = false)
-//    private String password;
-//
-//    @Column(unique = true, nullable = false)
-//    private String firstName;
-//
-//    @Column(unique = true, nullable = false)
-//    private String lastName;
-//
-//
-//    @CreatedDate
-//    @Column(unique = true, nullable = false)
-//    private LocalDateTime accountCreated;
-//
-//
-//    @LastModifiedDate
-//    @Column(nullable = false)
-//    private LocalDateTime accountUpdated;
-//
-//    }
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+
 @Data
 @Entity
 @Table(name = "users")
 public class User {
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public LocalDateTime getAccountCreated() {
-        return accountCreated;
-    }
-
-    public LocalDateTime getAccountUpdated() {
-        return accountUpdated;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonProperty("id")
     private UUID id;
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setAccountCreated(LocalDateTime accountCreated) {
-        this.accountCreated = accountCreated;
-    }
-
-    public void setAccountUpdated(LocalDateTime accountUpdated) {
-        this.accountUpdated = accountUpdated;
-    }
 
     @Column(name = "first_name")
     @JsonProperty("first_name")
@@ -135,4 +37,38 @@ public class User {
     @Column(name = "account_updated")
     @JsonProperty("account_updated")
     private LocalDateTime accountUpdated;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
+    @Column(name = "token_expiry")
+    private LocalDateTime tokenExpiry;
+
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = false;
+
+    // Getters and setters for all fields
+    public boolean isEmailVerified() {
+        return emailVerified;
     }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
+
+    public LocalDateTime getTokenExpiry() {
+        return tokenExpiry;
+    }
+
+    public void setTokenExpiry(LocalDateTime tokenExpiry) {
+        this.tokenExpiry = tokenExpiry;
+    }
+}

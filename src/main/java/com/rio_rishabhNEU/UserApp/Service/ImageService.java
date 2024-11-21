@@ -7,7 +7,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +16,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
 
 @Service
 public class ImageService {
@@ -29,7 +27,6 @@ public class ImageService {
     private final MeterRegistry meterRegistry;
     private final UserService userService;
 
-    @Autowired
     public ImageService(UserImageDAO imageDAO,
                         S3Service s3Service,
                         MeterRegistry meterRegistry,
@@ -38,35 +35,31 @@ public class ImageService {
         this.s3Service = s3Service;
         this.meterRegistry = meterRegistry;
         this.userService = userService;
+        logger.info("ImageService initialized");
     }
 
     public UserImage uploadImage(MultipartFile file) throws Exception {
         Timer.Sample sample = Timer.start(meterRegistry);
         try {
-            // Validate file extension
             String originalFilename = file.getOriginalFilename();
             String extension = getFileExtension(originalFilename);
             if (!ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
                 throw new IllegalArgumentException("Invalid file format. Allowed formats: PNG, JPG, JPEG");
             }
 
-            // Get current user
             String email = AuthUtil.getAuthenticatedUserEmail();
             UUID userId = userService.getUserByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"))
                     .getId();
 
-            // Delete existing image if present
             Optional<UserImage> existingImage = imageDAO.findByUserId(userId);
             existingImage.ifPresent(image -> {
                 s3Service.deleteFile(image.getUrl());
                 imageDAO.delete(image);
             });
 
-            // Upload new image to S3
             String s3Key = s3Service.uploadFile(file, userId);
 
-            // Create and save image metadata
             UserImage userImage = new UserImage();
             userImage.setFileName(originalFilename);
             userImage.setUrl(s3Key);
@@ -77,6 +70,7 @@ public class ImageService {
             UserImage savedImage = imageDAO.save(userImage);
             dbSample.stop(meterRegistry.timer("db.save.image.time"));
 
+            logger.info("Successfully uploaded image for user: {}", email);
             return savedImage;
         } finally {
             sample.stop(meterRegistry.timer("service.upload.image.time"));
@@ -116,6 +110,7 @@ public class ImageService {
             if (image.isPresent()) {
                 s3Service.deleteFile(image.get().getUrl());
                 imageDAO.delete(image.get());
+                logger.info("Successfully deleted image for user: {}", email);
                 return true;
             }
             return false;

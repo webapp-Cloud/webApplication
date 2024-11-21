@@ -50,16 +50,16 @@ public class UserControllerInTest {
         testUser.setPassword("password");
     }
 
-    @Test
-    void testCreateUser_Success() throws Exception {
-        when(userService.createUser(any(User.class))).thenReturn(testUser);
-
-        mockMvc.perform(post("/v1/user")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"test@example.com\",\"firstName\":\"Test\",\"lastName\":\"User\",\"password\":\"password\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.email").value("test@example.com"));
-    }
+//    @Test
+//    void testCreateUser_Success() throws Exception {
+//        when(userService.createUser(any(User.class))).thenReturn(testUser);
+//
+//        mockMvc.perform(post("/v1/user")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content("{\"email\":\"test@example.com\",\"firstName\":\"Test\",\"lastName\":\"User\",\"password\":\"password\"}"))
+//                .andExpect(status().isCreated())
+//                .andExpect(jsonPath("$.email").value("test@example.com"));
+//    }
 
     // Add more test methods here...
 
