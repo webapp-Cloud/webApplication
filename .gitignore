@@ -1,6 +1,7 @@
 # Compiled Java classes
 *.class
 
+.DS_Store
 # Maven specific
 target/
 !.mvn/wrapper/maven-wrapper.jar
