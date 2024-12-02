@@ -10,6 +10,21 @@ apt-get upgrade -y
 # Install required packages (no PostgreSQL, only Java)
 apt-get install -y openjdk-21-jdk maven curl unzip
 
+
+apt-get install -y \
+    openjdk-21-jdk \
+    postgresql-client \
+    unzip \
+    jq \
+    python3-pip
+
+# Install AWS CLI
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+./aws/install
+rm -rf aws awscliv2.zip
+
+
 # Install CloudWatch Agent
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
 dpkg -i -E ./amazon-cloudwatch-agent.deb
