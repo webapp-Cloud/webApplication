@@ -35,7 +35,7 @@ variable "subnet_id" {
 
 variable "ami_users" {
   type    = list(string)
-  default = ["039612889197"] # Empty list by default
+  default = ["039612889197", "156041419933"] # Empty list by default
 }
 
 variable "ami_name_prefix" {
@@ -68,6 +68,7 @@ source "amazon-ebs" "ubuntu" {
     Course      = "CSYE6225"
     Created     = timestamp()
     AutoScaling = "true"
+    SharedWith  = join(",", var.ami_users)
   }
 
   launch_block_device_mappings {
