@@ -19,6 +19,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/healthz").permitAll()
+                        .requestMatchers("/CICD").permitAll()
+
                         .requestMatchers("/v1/verifyEmail").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/user").permitAll()
                         .anyRequest().authenticated()
