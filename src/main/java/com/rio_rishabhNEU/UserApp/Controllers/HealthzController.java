@@ -48,6 +48,33 @@ public class HealthzController {
         }
     }
 
+    @RequestMapping(value = "/CICD", method = RequestMethod.GET)
+    public ResponseEntity<Void> CICD(@RequestParam Map<String, String> queryParams,
+                                            @RequestBody(required = false) Map<String, Object> requestBody) {
+        // Increment metrics counter if MeterRegistry is available
+        if (meterRegistry != null) {
+            meterRegistry.counter("api.calls", "endpoint", "/healthz", "method", "GET").increment();
+        }
+
+        if (!queryParams.isEmpty() || requestBody != null) {
+            return ResponseEntity.badRequest()
+                    .cacheControl(CacheControl.noCache())
+                    .build();
+        }
+
+        try (Connection connection = dataSource.getConnection()) {
+            return ResponseEntity.ok()
+                    .cacheControl(CacheControl.noCache())
+                    .build();
+        } catch (SQLException e) {
+            return ResponseEntity.status(503)
+                    .cacheControl(CacheControl.noCache())
+                    .build();
+        }
+    }
+
+
+
     @RequestMapping(value = "/healthz", method = RequestMethod.HEAD)
     public ResponseEntity<Void> headRequest() {
         return ResponseEntity.status(405).build();
